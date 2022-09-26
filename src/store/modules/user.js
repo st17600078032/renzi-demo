@@ -12,8 +12,7 @@ export default {
   },
   actions: {
     async loginAction({ commit }, loginData) {
-      const { data: { data }} = await login(loginData)
-      console.log(data)
+      const data = await login(loginData)
       commit('setToken', data)
     }
   }

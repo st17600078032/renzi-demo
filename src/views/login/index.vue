@@ -24,7 +24,7 @@
       <el-button :loading="loading" class="loginBtn" type="primary" style="width:100%;margin-bottom:30px;" @click="login">登录</el-button>
 
       <div class="tips">
-        <span style="margin-right:20px;">账号: 13800000002</span>
+        <span style="margin-right:20px;">账号: 13800000001</span>
         <span> 密码: 123456</span>
       </div>
 
@@ -77,7 +77,7 @@ export default {
       try {
         await this.$refs.loginForm.validate()
         this.loading = true
-        this.$store.dispatch('user/loginAction', this.loginForm)
+        await this.$store.dispatch('user/loginAction', this.loginForm)
         this.$router.push('/')
       } finally {
         this.loading = false

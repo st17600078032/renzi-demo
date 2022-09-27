@@ -39,7 +39,13 @@ request.interceptors.response.use(response => {
   Message.error(message)
   return Promise.reject(new Error(message))
 }, error => {
-  Message.error(error.message)
+  if (error.response && error.response.status === 401) {
+    store.dispatch('user/logout')
+    router.push('/login')
+    Message.error('登录过期')
+  } else {
+    Message.error(error.message)
+  }
   return Promise.reject(error)
 })
 

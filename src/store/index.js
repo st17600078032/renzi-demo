@@ -19,9 +19,11 @@ const store = new Vuex.Store({
     // paths: ['user.token']
     reducer(state) {
       const token = state.user.token
+      const TimeRanges = state.user.TimeRanges
       return {
         user: {
-          token: token
+          token: token,
+          TimeRanges: TimeRanges
         }
       }
     }

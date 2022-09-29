@@ -19,9 +19,11 @@
             <el-table-column align="center" prop="name" label="名称" width="240" />
             <el-table-column align="center" prop="description" label="描述" />
             <el-table-column align="center" label="操作">
-              <el-button size="small" type="success">分配权限</el-button>
-              <el-button size="small" type="primary">编辑</el-button>
-              <el-button size="small" type="danger">删除</el-button>
+              <template slot-scope="{row}">
+                <el-button size="small" type="success">分配权限</el-button>
+                <el-button size="small" type="primary" @click="editRole(row)">编辑</el-button>
+                <el-button size="small" type="danger" @click="deleteRole(row.id)">删除</el-button>
+              </template>
             </el-table-column>
 
           </el-table>
@@ -51,29 +53,31 @@
           />
           <el-form label-width="120px" style="margin-top:50px">
             <el-form-item label="公司名称">
-              <el-input disabled style="width:400px" />
+              <el-input v-model="formData.name" disabled style="width:400px" />
             </el-form-item>
             <el-form-item label="公司地址">
-              <el-input disabled style="width:400px" />
+              <el-input v-model="formData.companyAddress" disabled style="width:400px" />
             </el-form-item>
             <el-form-item label="邮箱">
-              <el-input disabled style="width:400px" />
+              <el-input v-model="formData.mailbox" disabled style="width:400px" />
             </el-form-item>
             <el-form-item label="备注">
-              <el-input type="textarea" :rows="3" disabled style="width:400px" />
+              <el-input v-model="formData.remarks" type="textarea" :rows="3" disabled style="width:400px" />
             </el-form-item>
           </el-form>
         </el-tab-pane>
       </el-tabs>
     </el-card>
 
-    <addRole :dialog-visible.sync="dialogVisible" @refreshList="getRoleList" />
+    <addRole ref="addRole" :dialog-visible.sync="dialogVisible" @refreshList="getRoleList" />
   </div>
 </template>
 
 <script>
-import { getRoleList } from '@/api/setting'
+import { getRoleList, deleteRole, getCompanyInfo } from '@/api/setting'
 import addRole from './components/addRole.vue'
+import { mapGetters } from 'vuex'
+
 export default {
   components: {
     addRole
@@ -91,6 +95,12 @@ export default {
       dialogVisible: false
     }
   },
+  computed: {
+    ...mapGetters(['companyId'])
+  },
+  created() {
+    this.getCompanyInfo()
+  },
   mounted() {
     this.getRoleList()
   },
@@ -101,7 +111,10 @@ export default {
         const { total, rows } = await getRoleList(this.page)
         this.total = total
         this.list = rows
-        console.log(rows)
+        if (total > 0 && rows.length === 0) {
+          this.page.page--
+          this.getRoleList()
+        }
       } catch (error) {
         console.log(error)
       } finally {
@@ -118,6 +131,28 @@ export default {
     },
     handleAdd() {
       this.dialogVisible = true
+    },
+    editRole(row) {
+      this.$refs.addRole.roleForm = { ...row }
+      this.dialogVisible = true
+    },
+    async deleteRole(id) {
+      //  提示
+      try {
+        await this.$confirm('确认删除该角色吗', '删除提示', {
+          cancelButtonText: '取消',
+          confirmButtonText: '确定'
+        })
+        // 只有点击了确定 才能进入到下方
+        await deleteRole(id) // 调用删除接口
+        this.getRoleList() // 重新加载数据
+        this.$message.success('删除角色成功')
+      } catch (error) {
+        console.log(error)
+      }
+    },
+    async getCompanyInfo() {
+      this.formData = await getCompanyInfo(this.companyId)
     }
   }
 }

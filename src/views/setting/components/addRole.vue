@@ -1,6 +1,6 @@
 <template>
   <el-dialog
-    title="新增角色"
+    :title="title"
     width="60%"
     :visible.sync="dialogVisible"
     :before-close="handleClose"
@@ -29,7 +29,7 @@
 </template>
 
 <script>
-import { addRole } from '@/api/setting'
+import { addRole, updateRole } from '@/api/setting'
 export default {
   name: 'HrsaasRoleDialog',
   props: {
@@ -50,18 +50,27 @@ export default {
       }
     }
   },
+  computed: {
+    title() {
+      return this.roleForm.id ? '编辑角色' : '新增角色'
+    }
+  },
   methods: {
     handleClose() {
       // 表单效果重置
       this.$refs.roleDialogForm.resetFields()
       this.$emit('update:dialogVisible', false)
+      this.roleForm = {
+        name: '',
+        description: ''
+      }
     },
     async handleAdd() {
       try {
         await this.$refs.roleDialogForm.validate()
         this.loading = true
-        await addRole(this.roleForm)
-        this.$message.success('角色新增成功')
+        this.roleForm.id ? await updateRole(this.roleForm) : await addRole(this.roleForm)
+        this.$message.success(`${this.roleForm.id ? '编辑' : '新增'}角色成功`)
         this.$emit('refreshList')
         this.handleClose()
       } catch (e) {

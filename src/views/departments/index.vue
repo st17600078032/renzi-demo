@@ -5,7 +5,7 @@
       <el-card class="tree-card">
         <!-- 用了一个行列布局 -->
         <!-- 缺少treeNode -->
-        <tree-tools :tree-node="company" :is-root="false" />
+        <tree-tools :tree-node="company" :is-root="false" @addDepts="addDepts" />
         <!--放置一个属性   这里的props和我们之前学习的父传子 的props没关系-->
       </el-card>
       <el-tree :data="departs" :props="defaultProps" default-expand-all>
@@ -14,7 +14,7 @@
         <!-- 顺序一定是 执行slot-scope的赋值 才去执行 props的传值 -->
         <tree-tools slot-scope="{ data }" :tree-node="data" @delDepts="getDepartments" @addDepts="addDepts" />
       </el-tree>
-      <add-dept :show-dialog="showDialog" />
+      <add-dept :show-dialog.sync="showDialog" :tree-node="currentNode" />
     </div>
   </div>
 </template>
@@ -37,7 +37,8 @@ export default {
       defaultProps: {
         label: 'name' // 表示 从这个属性显示内容
       },
-      company: { name: '江苏传智播客教育科技股份有限公司', manager: '负责人' }
+      company: { name: '江苏传智播客教育科技股份有限公司', manager: '负责人' },
+      currentNode: {}
     }
   },
   mounted() {
@@ -46,12 +47,13 @@ export default {
 
   methods: {
     async getDepartments() {
-      const { depts, companyManage, companyName } = await getDepartments()
-      this.departs = transListToTreeData(depts, '')
-      this.company = { name: companyName, manager: companyManage }
+      const result = await getDepartments()
+      this.departs = transListToTreeData(result.depts, '')
+      this.company = { name: result.companyName, manager: '负责人', id: '' }
     },
     addDepts(node) {
       this.showDialog = true // 显示弹层
+      this.currentNode = node
     }
   }
 }

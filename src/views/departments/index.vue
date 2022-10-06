@@ -14,7 +14,7 @@
         <!-- 顺序一定是 执行slot-scope的赋值 才去执行 props的传值 -->
         <tree-tools slot-scope="{ data }" :tree-node="data" @delDepts="getDepartments" @addDepts="addDepts" />
       </el-tree>
-      <add-dept :show-dialog.sync="showDialog" :tree-node="currentNode" />
+      <add-dept :show-dialog.sync="showDialog" :tree-node="currentNode" @refreshDepts="getDepartments" />
     </div>
   </div>
 </template>

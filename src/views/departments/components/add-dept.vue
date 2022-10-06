@@ -11,8 +11,8 @@
         <el-input v-model="formData.code" style="width:80%" placeholder="1-50个字符" />
       </el-form-item>
       <el-form-item label="部门负责人" prop="manager">
-        <el-select v-model="formData.manager" style="width:80%" placeholder="请选择">
-          <el-option label="username11" value="username" />
+        <el-select v-model="formData.manager" style="width:80%" placeholder="请选择" @focus="getEmployeesSimple">
+          <el-option v-for="item in peoples" :key="item.id" :label="item.username" :value="item.username" />
         </el-select>
       </el-form-item>
       <el-form-item label="部门介绍" prop="introduce">
@@ -23,8 +23,8 @@
     <el-row slot="footer" type="flex" justify="center">
       <!-- 列被分为24 -->
       <el-col :span="6">
-        <el-button type="primary" size="small">确定</el-button>
-        <el-button size="small">取消</el-button>
+        <el-button v-loading="loading" type="primary" size="small" @click="submit">确定</el-button>
+        <el-button size="small" @click="handleClose">取消</el-button>
       </el-col>
     </el-row>
   </el-dialog>
@@ -32,6 +32,7 @@
 
 <script>
 import { getDepartments } from '@/api/departments'
+import { getEmployeesSimple, addDepartments } from '@/api/employess'
 export default {
   name: 'HrsaasAddDept',
 
@@ -69,6 +70,8 @@ export default {
         manager: '', // 部门管理者
         introduce: '' // 部门介绍
       },
+      peoples: [],
+      loading: false,
       // 定义校验规则
       rules: {
         name: [
@@ -101,6 +104,32 @@ export default {
     handleClose() {
       this.$emit('update:showDialog', false)
       this.$refs.addDeptForm.resetFields()
+      this.formData = {
+        name: '', // 部门名称
+        code: '', // 部门编码
+        manager: '', // 部门管理者
+        introduce: '' // 部门介绍
+      }
+    },
+    async getEmployeesSimple() {
+      const res = await getEmployeesSimple()
+      this.peoples = res
+    },
+    async submit() {
+      try {
+        // 表单校验通过后 validator()
+        await this.$refs.addDeptForm.validate()
+        // 调用接口
+        this.loading = true
+        await addDepartments({ ...this.formData, pid: this.treeNode.id }) // 调用新增接口 添加父部门的id
+        this.$message.success('新增成功')
+        this.$emit('refreshDepts') // 告诉父组件，刷新列表
+        this.handleClose()
+      } catch (error) {
+        console.log(error)
+      } finally {
+        this.loading = false
+      }
     }
   }
 }

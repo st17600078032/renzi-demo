@@ -24,8 +24,8 @@
         <el-input v-model="formData.workNumber" style="width:80%" placeholder="请输入工号" />
       </el-form-item>
       <el-form-item label="部门" prop="departmentName">
-        <el-input v-model="formData.departmentName" style="width:80%" placeholder="请选择部门" />
-        <el-tree :data="treeData" :default-expand-all="true" :props="{ label: 'name' }" />
+        <el-input v-model="formData.departmentName" style="width:80%" placeholder="请选择部门" @focus="getDepartments" />
+        <el-tree v-show="ishow" v-loading="loading" :data="treeData" :default-expand-all="true" :props="{ label: 'name' }" @node-click="selectNode" />
       </el-form-item>
       <el-form-item label="转正时间" prop="correctionTime">
         <el-date-picker v-model="formData.correctionTime" style="width:80%" placeholder="请选择转正时间" />
@@ -50,6 +50,8 @@
 //  点击关闭按钮 close $emit 去改父组件里的值 (upate:dialogVisible)
 //  handleClose 完善 // 1. 表单重置 2.表单绑定的值从新赋值
 import EmployeeEnum from '@/api/constant/employees'
+import { getDepartments } from '@/api/departments'
+import { transListToTreeData } from '@/utils'
 export default {
   name: 'HrsaasAddEmployee',
   props: {
@@ -61,7 +63,8 @@ export default {
 
   data() {
     return {
-      treeData: [{ name: '行政部', manager: '刘备' }],
+      treeData: [], // 定义数组接收树形数据
+      loading: false, // 控制树的显示或者隐藏进度条
       hireType: EmployeeEnum.hireType,
       formData: {
         username: '',
@@ -72,6 +75,7 @@ export default {
         timeOfEntry: '',
         correctionTime: ''
       },
+      ishow: false,
       // 表单校验 步骤
       // el-form配置model和rules属性
       // el-form-item配置prop属性
@@ -113,6 +117,7 @@ export default {
   methods: {
     handleClose() {
       // 表单重置
+      this.ishow = false
       this.$refs.addEmploy.resetFields()
       // 重新赋值
       this.formData = {
@@ -125,6 +130,18 @@ export default {
         correctionTime: ''
       }
       this.$emit('update:dialogVisible', false)
+    },
+    async getDepartments() {
+      this.ishow = true
+      this.loading = true
+      const { depts } = await getDepartments()
+      // depts是数组 但不是树形
+      this.treeData = transListToTreeData(depts, '')
+      this.loading = false
+    },
+    selectNode(node) {
+      this.ishow = false
+      this.formData.departmentName = node.name
     }
   }
 }

@@ -36,7 +36,7 @@
       <el-row type="flex" justify="center">
         <el-col :span="6">
           <el-button size="small" @click="handleClose">取消</el-button>
-          <el-button type="primary" size="small">确定</el-button>
+          <el-button type="primary" size="small" @click="btnOK">确定</el-button>
         </el-col>
       </el-row>
     </template>
@@ -52,6 +52,7 @@
 import EmployeeEnum from '@/api/constant/employees'
 import { getDepartments } from '@/api/departments'
 import { transListToTreeData } from '@/utils'
+import { addEmployee } from '@/api/employees'
 export default {
   name: 'HrsaasAddEmployee',
   props: {
@@ -142,6 +143,20 @@ export default {
     selectNode(node) {
       this.ishow = false
       this.formData.departmentName = node.name
+    },
+    async btnOK() {
+      try {
+        await this.$refs.addEmploy.validate()
+        // 调用新增接口
+        await addEmployee(this.formData) // 新增员工
+        // 告诉父组件更新数据
+        // this.$parent 可以直接调用到父组件的实例 实际上就是父组件this
+        // this.$emit
+        this.$parent.getEmployeeList()
+        this.handleClose()
+      } catch (error) {
+        console.log(error)
+      }
     }
   }
 }

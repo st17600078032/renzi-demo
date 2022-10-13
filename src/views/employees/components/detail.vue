@@ -1,8 +1,8 @@
 <template>
   <div class="app-container">
     <el-card>
-      <el-tabs>
-        <el-tab-pane label="登录账户设置">
+      <el-tabs v-model="activeName" @tab-click="tabClick">
+        <el-tab-pane lazy name="first" label="登录账户设置">
           <!-- 放置表单 -->
           <el-form ref="userForm" :model="userInfo" :rules="rules" label-width="120px" style="margin-left: 120px; margin-top:30px">
             <el-form-item label="姓名:" prop="username">
@@ -16,10 +16,10 @@
             </el-form-item>
           </el-form>
         </el-tab-pane>
-        <el-tab-pane label="个人详情">
+        <el-tab-pane name="second" lazy label="个人详情">
           <userInfo />
         </el-tab-pane>
-        <el-tab-pane label="岗位信息">
+        <el-tab-pane name="third" lazy label="岗位信息">
           <jobInfo />
         </el-tab-pane>
       </el-tabs>
@@ -32,6 +32,7 @@ import { getUserDetailById } from '@/api/user'
 import { saveUserDetailById } from '@/api/employees'
 import userInfo from './user-info.vue'
 import jobInfo from './job-info.vue'
+import Cookies from 'js-cookie'
 export default {
   components: {
     userInfo,
@@ -39,6 +40,7 @@ export default {
   },
   data() {
     return {
+      activeName: Cookies.get('activeName') || 'first',
       userId: this.$route.params.id, // 这样可以后面直接通过 this.userId进行获取数据
       userInfo: {
         //   专门存放基本信息
@@ -68,6 +70,9 @@ export default {
       } catch (error) {
         console.log(error)
       }
+    },
+    tabClick() {
+      Cookies.set('activeName', this.activeName)
     }
   }
 }

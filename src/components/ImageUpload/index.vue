@@ -2,6 +2,7 @@
   <div>
     <!-- action: 远程服务器接口上传地址 -->
     <el-upload
+      v-loading="loading"
       class="uploadImg"
       action="#"
       list-type="picture-card"
@@ -34,20 +35,31 @@ const cos = new COS({
 })
 export default {
   name: 'UploadImg',
-  data() {
-    return {
-      fileList: [
-        { name: 'default', url: 'http://destiny001.gitee.io/image/cxk.gif' }
-      ],
-      previewDialog: false,
-      previewImgUrl: ''
+  props: {
+    imgurl: {
+      type: String,
+      default: ''
     }
   },
-
+  data() {
+    return {
+      fileList: [],
+      previewDialog: false,
+      previewImgUrl: '',
+      loading: false
+    }
+  },
+  watch: {
+    imgurl() {
+      this.fileList.push({
+        name: 'default',
+        url: this.imgurl
+      })
+    }
+  },
   created() {
 
   },
-
   methods: {
     onPreview(file) {
       this.previewImgUrl = file.url
@@ -85,6 +97,7 @@ export default {
       this.fileList = fileList
     },
     onHttpRequest({ file }) {
+      this.loading = true
       // console.log(file)
       cos.putObject({
         Bucket: 'ststst-1314382588', /* 填入您自己的存储桶，必须字段 */
@@ -94,10 +107,14 @@ export default {
         onProgress: function(progressData) {
           console.log(JSON.stringify(progressData))
         }
-      }, function(err, data) {
+      }, (err, data) => {
         // err 上传失败的信息 如果上传成功 err为null
         // data 上传成功的信息
-        console.log(err || data)
+        if (err) return this.$message('图片上传失败')
+        this.loading = false
+        this.$emit('on-success', {
+          imgUrl: 'https://' + data.Location
+        })
       })
     }
   }

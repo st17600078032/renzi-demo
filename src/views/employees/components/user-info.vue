@@ -58,6 +58,7 @@
         <el-col :span="12">
           <el-form-item label="员工头像">
             <!-- 放置上传图片 -->
+            <UploadImg :imgurl="imgUrl" />
           </el-form-item>
         </el-col>
       </el-row>
@@ -88,9 +89,9 @@
         </el-form-item>
         <!-- 个人头像 -->
         <!-- 员工照片 -->
-
         <el-form-item label="员工照片">
           <!-- 放置上传图片 -->
+          <UploadImg :imgurl="picUrl" />
         </el-form-item>
         <el-form-item label="国家/地区">
           <el-select v-model="formData.nationalArea" class="inputW2">
@@ -389,8 +390,12 @@
 import EmployeeEnum from '@/api/constant/employees'
 import { getPersonalDetail, updatePersonal, saveUserDetailById } from '@/api/employees'
 import { getUserDetailById } from '@/api/user'
+import UploadImg from '@/components/ImageUpload'
 
 export default {
+  components: {
+    UploadImg
+  },
   data() {
     return {
       userId: this.$route.params.id,
@@ -458,7 +463,9 @@ export default {
         isThereAnyCompetitionRestriction: '', // 有无竞业限制
         proofOfDepartureOfFormerCompany: '', // 前公司离职证明
         remarks: '' // 备注
-      }
+      },
+      imgUrl: '',
+      picUrl: ''
     }
   },
   created() {
@@ -468,6 +475,9 @@ export default {
   methods: {
     async getPersonalDetail() {
       this.formData = await getPersonalDetail(this.userId) // 获取员工数据
+      if (this.formData.staffPhoto) {
+        this.picUrl = this.formData.staffPhoto
+      }
     },
     async savePersonal() {
       await updatePersonal(this.formData)
@@ -480,6 +490,10 @@ export default {
     },
     async getUserDetailById() {
       this.userInfo = await getUserDetailById(this.userId)
+      console.log(this.userInfo)
+      if (this.userInfo.staffPhoto) {
+        this.imgUrl = this.userInfo.staffPhoto
+      }
     }
   }
 }

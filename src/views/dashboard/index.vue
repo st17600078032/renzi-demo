@@ -2,7 +2,10 @@
   <div class="dashboard-container">
     <div class="dashboard-text">name: {{ name }}</div>
     <div>
-      <UploadImg />
+      <UploadImg @on-success="onSuccess1" />
+    </div>
+    <div>
+      <UploadImg @on-success="onSuccess2" />
     </div>
   </div>
 </template>
@@ -21,6 +24,14 @@ export default {
     ])
   },
   methods: {
+    onSuccess1(val) {
+      alert('123')
+      console.log(val)
+    },
+    onSuccess2(val) {
+      alert('456')
+      console.log(val)
+    }
   }
 }
 </script>

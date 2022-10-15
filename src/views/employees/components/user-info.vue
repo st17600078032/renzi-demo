@@ -1,5 +1,6 @@
 <template>
   <div class="user-info">
+    <i class="el-icon-printer" @click="$router.push('/employees/print/' + userId)" />
     <!-- 个人信息 -->
     <el-form label-width="220px">
       <!-- 工号 入职时间 -->
@@ -58,7 +59,7 @@
         <el-col :span="12">
           <el-form-item label="员工头像">
             <!-- 放置上传图片 -->
-            <UploadImg :imgurl="imgUrl" />
+            <UploadImg ref="upliadAvatar" :imgurl="imgUrl" @on-success="saveImg" />
           </el-form-item>
         </el-col>
       </el-row>
@@ -89,7 +90,7 @@
         </el-form-item>
         <!-- 个人头像 -->
         <!-- 员工照片 -->
-        <el-form-item label="员工照片">
+        <el-form-item ref="employessPic" label="员工照片" @on-success="savePic">
           <!-- 放置上传图片 -->
           <UploadImg :imgurl="picUrl" />
         </el-form-item>
@@ -480,13 +481,23 @@ export default {
       }
     },
     async savePersonal() {
+      if (this.$refs.employessPic.loading) {
+        return this.$message.error('头像还在上传')
+      }
       await updatePersonal(this.formData)
       this.$message.success('保存成功')
     },
     async saveUser() {
     //  调用父组件
-      await saveUserDetailById(this.userInfo)
-      this.$message.success('保存成功')
+      try {
+        if (this.$refs.upliadAvatar.loading) {
+          return this.$message.error('头像还在上传')
+        }
+        await saveUserDetailById(this.userInfo)
+        this.$message.success('保存成功')
+      } catch (error) {
+        this.$message.error('保存失败')
+      }
     },
     async getUserDetailById() {
       this.userInfo = await getUserDetailById(this.userId)
@@ -494,6 +505,12 @@ export default {
       if (this.userInfo.staffPhoto) {
         this.imgUrl = this.userInfo.staffPhoto
       }
+    },
+    saveImg(data) {
+      this.userInfo.staffPhoto = data.imgUrl
+    },
+    savePic(data) {
+      this.formData.staffPhoto = data.imgUrl
     }
   }
 }

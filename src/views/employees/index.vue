@@ -14,6 +14,11 @@
     <el-card>
       <el-table v-loading="loading" border :data="list">
         <el-table-column label="序号" sortable="" width="80" type="index" />
+        <el-table-column label="头像">
+          <template slot-scope="{row}">
+            <img style="height:100px" :src="row.staffPhoto" alt="" @click="yltx(row.staffPhoto)">
+          </template>
+        </el-table-column>
         <el-table-column label="姓名" prop="username" />
         <el-table-column label="工号" prop="workNumber" />
         <el-table-column label="聘用形式" prop="formOfEmployment" :formatter="formatterFn" />
@@ -55,6 +60,13 @@
       </el-row>
     </el-card>
     <add-employee :dialog-visible.sync="showDialog" />
+
+    <el-dialog
+      title="预览图片"
+      :visible.sync="dialogVisible"
+      width="50%"
+    >
+      <canvas ref="canvas" /></el-dialog>
   </div>
 </template>
 
@@ -62,6 +74,7 @@
 import { getEmployeeList, delEmployee } from '@/api/employees'
 import EnumHireType from '@/api/constant/employees'
 import addEmployee from './components/add-employee'
+import QRCode from 'qrcode'
 
 export default {
   name: 'HrsaasIndex',
@@ -78,7 +91,8 @@ export default {
       list: [], // 接数据的
       total: 0, // 总数
       loading: false,
-      hireType: EnumHireType.hireType
+      hireType: EnumHireType.hireType,
+      dialogVisible: false
     }
   },
 
@@ -155,6 +169,14 @@ export default {
     },
     goDetail(row) {
       this.$router.push(`/employees/detail/${row.id}`)
+    },
+    yltx(staffPhoto) {
+      if (!staffPhoto) return this.$message.erroe('暂无头像')
+      this.dialogVisible = true
+      this.$nextTick(() => {
+        QRCode.toCanvas(this.$refs.canvas, 'staffPhoto'
+        )
+      })
     }
   }
 }

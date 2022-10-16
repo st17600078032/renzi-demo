@@ -20,7 +20,7 @@
             <el-table-column align="center" prop="description" label="描述" />
             <el-table-column align="center" label="操作">
               <template slot-scope="{row}">
-                <el-button size="small" type="success">分配权限</el-button>
+                <el-button size="small" type="success" @click="setPermission(row)">分配权限</el-button>
                 <el-button size="small" type="primary" @click="editRole(row)">编辑</el-button>
                 <el-button size="small" type="danger" @click="deleteRole(row.id)">删除</el-button>
               </template>
@@ -51,25 +51,16 @@
             show-icon
             :closable="false"
           />
-          <el-form label-width="120px" style="margin-top:50px">
-            <el-form-item label="公司名称">
-              <el-input v-model="formData.name" disabled style="width:400px" />
-            </el-form-item>
-            <el-form-item label="公司地址">
-              <el-input v-model="formData.companyAddress" disabled style="width:400px" />
-            </el-form-item>
-            <el-form-item label="邮箱">
-              <el-input v-model="formData.mailbox" disabled style="width:400px" />
-            </el-form-item>
-            <el-form-item label="备注">
-              <el-input v-model="formData.remarks" type="textarea" :rows="3" disabled style="width:400px" />
-            </el-form-item>
-          </el-form>
         </el-tab-pane>
       </el-tabs>
     </el-card>
 
-    <addRole ref="addRole" :dialog-visible.sync="dialogVisible" @refreshList="getRoleList" />
+    <addRole
+      ref="addRole"
+      :dialog-visible.sync="dialogVisible"
+      @refreshList="getRoleList"
+    />
+    <setPermission :role-id="roleId" :dialog-visible.sync="dialogVisibleSetPermission" />
   </div>
 </template>
 
@@ -77,10 +68,12 @@
 import { getRoleList, deleteRole, getCompanyInfo } from '@/api/setting'
 import addRole from './components/addRole.vue'
 import { mapGetters } from 'vuex'
+import setPermission from './components/setPermission.vue'
 
 export default {
   components: {
-    addRole
+    addRole,
+    setPermission
   },
   data() {
     return {
@@ -92,7 +85,9 @@ export default {
       total: 0, // 记录总数
       list: [],
       loading: false,
-      dialogVisible: false
+      dialogVisible: false,
+      dialogVisibleSetPermission: false,
+      roleId: ''
     }
   },
   computed: {
@@ -153,6 +148,10 @@ export default {
     },
     async getCompanyInfo() {
       this.formData = await getCompanyInfo(this.companyId)
+    },
+    setPermission(row) {
+      this.dialogVisibleSetPermission = true
+      this.roleId = row.id
     }
   }
 }

@@ -40,7 +40,7 @@
             <el-button type="text" size="small">转正</el-button>
             <el-button type="text" size="small">调岗</el-button>
             <el-button type="text" size="small">离职</el-button>
-            <el-button type="text" size="small">角色</el-button>
+            <el-button type="text" size="small" @click="showSetRole(row)">角色</el-button>
             <el-button type="text" size="small" @click="deleteEmployee(row.id)">删除</el-button>
           </template>
         </el-table-column>
@@ -67,19 +67,29 @@
       width="50%"
     >
       <canvas ref="canvas" /></el-dialog>
+
+    <!-- @update:dialog-visible="dialogVisibleSetRole=$event"
+    .sync 既要传值给子组件 子组件还要修改父组件的该值
+    -->
+    <assignRole
+      :dialog-visible.sync="dialogVisibleSetRole"
+      :userid="id"
+    />
   </div>
 </template>
 
 <script>
 import { getEmployeeList, delEmployee } from '@/api/employees'
 import EnumHireType from '@/api/constant/employees'
+import assignRole from './components/assign-role'
 import addEmployee from './components/add-employee'
 import QRCode from 'qrcode'
 
 export default {
   name: 'HrsaasIndex',
   components: {
-    addEmployee
+    addEmployee,
+    assignRole
   },
   data() {
     return {
@@ -92,7 +102,9 @@ export default {
       total: 0, // 总数
       loading: false,
       hireType: EnumHireType.hireType,
-      dialogVisible: false
+      dialogVisible: false,
+      dialogVisibleSetRole: false,
+      id: ''
     }
   },
 
@@ -177,6 +189,10 @@ export default {
         QRCode.toCanvas(this.$refs.canvas, 'staffPhoto'
         )
       })
+    },
+    showSetRole(row) {
+      this.id = row.id
+      this.dialogVisibleSetRole = true
     }
   }
 }

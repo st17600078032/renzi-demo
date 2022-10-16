@@ -21,6 +21,9 @@ import * as directives from '@/directives'
 import components from '@/components/index'
 Vue.use(components)
 
+import Print from 'vue-print-nb'
+Vue.use(Print)
+
 // 注册自定义指令
 // 遍历所有的导出的指令对象 完成自定义全局注册
 Object.keys(directives).forEach(key => {

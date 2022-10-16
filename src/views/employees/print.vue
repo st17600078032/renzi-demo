@@ -1,6 +1,9 @@
 <template>
-  <div id="myPrint" class="dashboard-container">
-    <div class="app-container">
+  <div class="dashboard-container">
+    <el-button v-print="'myPrint'" size="small" type="primary">
+      打印
+    </el-button>
+    <div id="myPrint" class="app-container">
       <el-card>
         <el-breadcrumb separator="/" class="titInfo ">
           <el-breadcrumb-item :to="{ path: '/' }">首页</el-breadcrumb-item>
@@ -320,7 +323,7 @@
               <td>{{ formData.recommenderBusinessPeople }}</td>
             </tr>
           </table>
-          <div class="foot">签字：___________日期:___________</div>
+          <div class="foot">签字:___________日期:___________</div>
         </div>
       </el-card>
     </div>

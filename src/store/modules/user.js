@@ -1,5 +1,6 @@
 import { login } from '@/api/login'
 import { getUserInfo, getUserDetailById } from '@/api/user'
+import { resetRouter } from '@/router'
 
 export default {
   namespaced: true,
@@ -37,11 +38,12 @@ export default {
       const res1 = await getUserDetailById(res.userId)
       const result = { ...res, ...res1 }
       commit('setUserInfo', result)
-      return JSON.parse(JSON.stringify(result))
+      return res.roles
     },
     logout({ commit }) {
       commit('removeUserInfo')
       commit('removeToken')
+      resetRouter()
     }
   }
 }

@@ -4,6 +4,9 @@ export default {
   path: '/attendances',
 
   component: Layout,
+  meat: {
+    id: 'attendances'
+  },
   children: [
     {
       path: '',

@@ -1,9 +1,12 @@
 import Layout from '@/layout'
 
 export default {
-  path: '/setting',
+  path: '/settings',
 
   component: Layout,
+  meat: {
+    id: 'settings'
+  },
   children: [
     {
       path: '',
